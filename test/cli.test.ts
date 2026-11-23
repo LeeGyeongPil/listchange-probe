@@ -1,6 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { fixture, ROOT, runCli } from './helpers.js';
 
 const version = (JSON.parse(readFileSync(`${ROOT}/package.json`, 'utf8')) as { version: string }).version;
@@ -87,11 +89,19 @@ test('negative numbers and unwritable log paths give localized messages', () => 
   const neg = runCli(['report', fixture('pass.jsonl'), '--threshold-ms', '-5', '--lang', 'ko']);
   assert.equal(neg.status, 64);
   assert.match(neg.stderr, /0 이상의 숫자/);
-  const after = runCli(['serve', '--log', '/tmp/x.jsonl', '--after', '-1']);
+  const after = runCli(['serve', '--log', join(tmpdir(), 'lcp-never-written.jsonl'), '--after', '-1']);
   assert.equal(after.status, 64);
   assert.match(after.stderr, /non-negative/);
-  const bad = runCli(['serve', '--log', '/proc/nonexistent/x/y.jsonl', '--lang', 'ko']);
-  assert.equal(bad.status, 3);
-  assert.match(bad.stderr, /쓸 수 없습니다/);
-  assert.doesNotMatch(bad.stderr, /unexpected error/);
+  // A log path below a regular file cannot be created on any OS (ENOTDIR), even for root.
+  const dir = mkdtempSync(join(tmpdir(), 'lcp-cli-'));
+  try {
+    const blocker = join(dir, 'file');
+    writeFileSync(blocker, 'x');
+    const bad = runCli(['serve', '--log', join(blocker, 'x', 'y.jsonl'), '--lang', 'ko']);
+    assert.equal(bad.status, 3);
+    assert.match(bad.stderr, /쓸 수 없습니다/);
+    assert.doesNotMatch(bad.stderr, /unexpected error/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });

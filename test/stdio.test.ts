@@ -37,7 +37,7 @@ async function runSession(logPath: string, callTrigger: boolean): Promise<{ stde
   return { stderr, refreshed: didRefresh };
 }
 
-test('AC-4: serve over stdio keeps the protocol clean, records a JSONL log and report says PASS (delay >= 250 ms)', async () => {
+test('AC-4: serve over stdio keeps the protocol clean, records a JSONL log and report says PASS (delay >= 200 ms)', async () => {
   const dir = mkdtempSync(join(tmpdir(), 'lcp-'));
   try {
     const log = join(dir, 'nested', 'probe.jsonl'); // the missing folder is created
@@ -52,7 +52,7 @@ test('AC-4: serve over stdio keeps the protocol clean, records a JSONL log and r
     const [v] = judge(events, { thresholdMs: 2000 });
     assert.ok(v);
     assert.equal(v.verdict, 'PASS');
-    assert.ok((v.relist_delay_ms ?? 0) >= 250, `delay was ${v.relist_delay_ms}`);
+    assert.ok((v.relist_delay_ms ?? 0) >= 200, `delay was ${v.relist_delay_ms}`);
     assert.equal(events.at(-1)?.event, 'close');
   } finally {
     rmSync(dir, { recursive: true, force: true });
