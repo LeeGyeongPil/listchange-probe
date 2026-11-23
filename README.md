@@ -246,7 +246,7 @@ npm install
 npm test
 ```
 
-41 tests run offline. Bugs and suggestions are welcome as issues. Changes are recorded in [CHANGELOG.md](CHANGELOG.md).
+42 tests run offline. Bugs and suggestions are welcome as issues. Changes are recorded in [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 MIT. Built on [@modelcontextprotocol/sdk](https://github.com/modelcontextprotocol/typescript-sdk) (MIT).

@@ -246,7 +246,7 @@ npm install
 npm test
 ```
 
-테스트 41개가 오프라인으로 돌아갑니다. 버그·제안은 이슈로 남겨 주세요. 변경 기록은 [CHANGELOG.md](CHANGELOG.md).
+테스트 42개가 오프라인으로 돌아갑니다. 버그·제안은 이슈로 남겨 주세요. 변경 기록은 [CHANGELOG.md](CHANGELOG.md).
 
 ## 라이선스
 MIT. [@modelcontextprotocol/sdk](https://github.com/modelcontextprotocol/typescript-sdk)(MIT)를 사용합니다.
