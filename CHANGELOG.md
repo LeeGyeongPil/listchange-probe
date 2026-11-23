@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-11-23
+
+### Changed
+- Tests are split in two layers: `npm test` runs only deterministic unit tests (fixtures, the CLI called in-process, the probe server in memory; no timers, child processes, temporary files or ports), and `npm run test:integration` runs the real child-process, timer and demo checks locally.
+- CI is reduced to `npm ci`, `npm run build` and `npm test` on Node 22; the failure-diagnostics helper and the log upload are removed.
+- The CLI entry point is split into `src/cli.ts` (starts the process) and `src/main.ts` (the commands). Output and exit codes are unchanged.
+
+### Docs
+- README: all extra verdict reasons are listed, the 0 ms of the simulated refresh client is explained, and the log example is in seq order.
+
 ## [0.1.4] - 2026-11-23
 
 ### Fixed
@@ -41,7 +51,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `--lang en|ko`, `LISTCHANGE_PROBE_LANG`, then `LC_ALL`/`LC_MESSAGES`/`LANG`.
 - `examples/dispatcher-server.ts`: fixed-dispatcher workaround for clients that ignore `list_changed`.
 
-[Unreleased]: https://github.com/LeeGyeongPil/listchange-probe/compare/v0.1.4...HEAD
+[Unreleased]: https://github.com/LeeGyeongPil/listchange-probe/compare/v0.1.5...HEAD
+[0.1.5]: https://github.com/LeeGyeongPil/listchange-probe/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/LeeGyeongPil/listchange-probe/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/LeeGyeongPil/listchange-probe/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/LeeGyeongPil/listchange-probe/compare/v0.1.1...v0.1.2
