@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-11-23
+
+### Fixed
+- `demo`: the refresh client now waits for its re-list to finish instead of a fixed pause, so results no longer depend on machine speed.
+- `demo`: the delayed client schedules its re-list once per trigger.
+- A log path that cannot be written now exits with code 3 and a clear message.
+- Tests: stdio timing assertions relaxed for slow CI; added a test for the log-path error.
+- CI: job timeout and tool versions printed in the log.
+
 ## [0.1.1] - 2026-11-23
 
 ### Fixed
@@ -21,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `--lang en|ko`, `LISTCHANGE_PROBE_LANG`, then `LC_ALL`/`LC_MESSAGES`/`LANG`.
 - `examples/dispatcher-server.ts`: fixed-dispatcher workaround for clients that ignore `list_changed`.
 
-[Unreleased]: https://github.com/LeeGyeongPil/listchange-probe/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/LeeGyeongPil/listchange-probe/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/LeeGyeongPil/listchange-probe/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/LeeGyeongPil/listchange-probe/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/LeeGyeongPil/listchange-probe/releases/tag/v0.1.0
