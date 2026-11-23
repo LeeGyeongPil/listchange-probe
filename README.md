@@ -49,7 +49,7 @@ mock:ignore   s-5bec6065  tools     FAIL       -        no_relist; stale_call(se
 mock:delayed  s-4e6e020a  tools     PASS_SLOW  1501 ms  slow_relist; new_item_used=yes
 ```
 
-(Session ids differ on every run.) Note `mock:ignore`: calling the new tool works even when the client never re-listed, so a working new tool is not proof. The verdict is based on whether the client asked for the list again.
+(Session ids differ on every run.) `mock:refresh` is a simulated client built to re-list immediately (debounce 0), so it shows 0 ms; a real TypeScript SDK client waits about 300 ms. `npm start -- --lang en` forces English output. Note `mock:ignore`: calling the new tool works even when the client never re-listed, so a working new tool is not proof. The verdict is based on whether the client asked for the list again.
 
 Now probe a real client:
 
@@ -104,7 +104,7 @@ Verdicts:
 | `FAIL` | No list request followed the notification |
 | `UNKNOWN` | Not enough evidence (no notification was sent, or the session ended too early) |
 
-Extra reasons shown in DETAILS: `stale_call` (the client called an item that was already removed), `refreshed_on_new_session` (the client only picked up the change after reconnecting), `slow_relist`, `no_relist`.
+Extra reasons shown in DETAILS: `stale_call` (the client called an item that was already removed), `refreshed_on_new_session` (the client only picked up the change after reconnecting), `slow_relist`, `no_relist`, `stale_call_before_relist` (a removed item was called before the client re-listed), `no_notification` (the probe never sent `list_changed`, UNKNOWN), `session_ended_early` (the session closed before the threshold passed with no stale call, UNKNOWN).
 
 ![A FAIL report with evidence lines](docs/images/02-report-fail.png)
 *A FAIL verdict: no re-list after the notification, and a stale call to the removed tool at log seq 11.*
@@ -191,8 +191,8 @@ One JSON object per line. These lines come from `test/fixtures/fail.jsonl` (shor
 
 ```jsonl
 {"seq": 0, "t_ms": 1, "session": "s-fail", "event": "start", "tool": "listchange-probe", "version": "0.1.0", "transport": "stdio", "scenarios": ["tools"]}
-{"seq": 9, "t_ms": 7, "session": "s-fail", "dir": "out", "kind": "notification", "method": "notifications/tools/list_changed"}
 {"seq": 4, "t_ms": 5, "session": "s-fail", "dir": "in", "kind": "request", "method": "tools/list"}
+{"seq": 9, "t_ms": 7, "session": "s-fail", "dir": "out", "kind": "notification", "method": "notifications/tools/list_changed"}
 {"seq": 11, "t_ms": 3007, "session": "s-fail", "dir": "in", "kind": "request", "method": "tools/call", "name": "probe_old"}
 {"seq": 12, "t_ms": 3007, "session": "s-fail", "dir": "out", "kind": "response", "error_code": -32602}
 ```
@@ -243,10 +243,11 @@ flowchart LR
 ## Development
 ```bash
 npm install
-npm test
+npm test                   # unit tests: fixtures, same process, no timers (what CI runs)
+npm run test:integration   # real child processes, timers and the demo (local, before a release)
 ```
 
-42 tests run offline. Bugs and suggestions are welcome as issues. Changes are recorded in [CHANGELOG.md](CHANGELOG.md).
+CI runs `npm ci`, `npm run build` and `npm test` only. Bugs and suggestions are welcome as issues. Changes are recorded in [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 MIT. Built on [@modelcontextprotocol/sdk](https://github.com/modelcontextprotocol/typescript-sdk) (MIT).

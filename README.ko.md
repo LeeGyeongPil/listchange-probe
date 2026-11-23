@@ -49,7 +49,7 @@ mock:ignore   s-87a9d396  tools     FAIL       -        no_relist; stale_call(se
 mock:delayed  s-68d8806c  tools     PASS_SLOW  1502 ms  slow_relist; new_item_used=yes
 ```
 
-(세션 id 는 실행마다 다릅니다.) `mock:ignore` 를 보세요. 클라이언트가 목록을 다시 받지 않아도 새 도구 호출은 성공하므로, 새 도구가 동작하는 것은 증거가 아닙니다. 판정은 클라이언트가 목록을 다시 요청했는지로 합니다.
+(세션 id 는 실행마다 다릅니다.) `mock:refresh` 는 바로 다시 받도록 만든 모의 클라이언트(디바운스 0)라서 0 ms 로 나옵니다. 실제 TypeScript SDK 클라이언트는 약 300 ms 기다립니다. `npm start -- --lang ko` 로 한국어 출력을 고정할 수 있습니다. `mock:ignore` 를 보세요. 클라이언트가 목록을 다시 받지 않아도 새 도구 호출은 성공하므로, 새 도구가 동작하는 것은 증거가 아닙니다. 판정은 클라이언트가 목록을 다시 요청했는지로 합니다.
 
 이제 실제 클라이언트를 확인합니다.
 
@@ -104,7 +104,7 @@ mock:delayed  s-68d8806c  tools     PASS_SLOW  1502 ms  slow_relist; new_item_us
 | `FAIL` | 알림 뒤에 목록 요청이 오지 않음 |
 | `UNKNOWN` | 증거 부족(알림이 안 나갔거나 세션이 너무 일찍 끝남) |
 
-상세 열에 붙는 사유: `stale_call`(이미 지운 항목을 호출), `refreshed_on_new_session`(재연결한 뒤에야 변경을 반영), `slow_relist`, `no_relist`.
+상세 열에 붙는 사유: `stale_call`(이미 지운 항목을 호출), `refreshed_on_new_session`(재연결한 뒤에야 변경을 반영), `slow_relist`, `no_relist`, `stale_call_before_relist`(목록을 다시 받기 전에 지워진 항목을 호출), `no_notification`(프로브가 `list_changed` 를 보내지 않음, UNKNOWN), `session_ended_early`(오래된 항목 호출 없이 임계값 전에 세션이 끝남, UNKNOWN).
 
 ![근거 줄이 있는 FAIL 보고서](docs/images/02-report-fail.ko.png)
 *FAIL 판정: 알림 뒤 재요청이 없고, 로그 seq 11 에서 지워진 도구를 호출했습니다.*
@@ -191,8 +191,8 @@ API 키도 네트워크도 필요 없습니다.
 
 ```jsonl
 {"seq": 0, "t_ms": 1, "session": "s-fail", "event": "start", "tool": "listchange-probe", "version": "0.1.0", "transport": "stdio", "scenarios": ["tools"]}
-{"seq": 9, "t_ms": 7, "session": "s-fail", "dir": "out", "kind": "notification", "method": "notifications/tools/list_changed"}
 {"seq": 4, "t_ms": 5, "session": "s-fail", "dir": "in", "kind": "request", "method": "tools/list"}
+{"seq": 9, "t_ms": 7, "session": "s-fail", "dir": "out", "kind": "notification", "method": "notifications/tools/list_changed"}
 {"seq": 11, "t_ms": 3007, "session": "s-fail", "dir": "in", "kind": "request", "method": "tools/call", "name": "probe_old"}
 {"seq": 12, "t_ms": 3007, "session": "s-fail", "dir": "out", "kind": "response", "error_code": -32602}
 ```
@@ -243,10 +243,11 @@ flowchart LR
 ## 개발·기여
 ```bash
 npm install
-npm test
+npm test                    # 단위 테스트: 픽스처, 같은 프로세스, 타이머 없음 (CI 와 같음)
+npm run test:integration   # 실제 자식 프로세스·타이머·demo (로컬, 릴리스 전)
 ```
 
-테스트 42개가 오프라인으로 돌아갑니다. 버그·제안은 이슈로 남겨 주세요. 변경 기록은 [CHANGELOG.md](CHANGELOG.md).
+CI 는 `npm ci`, `npm run build`, `npm test` 만 돌립니다. 버그·제안은 이슈로 남겨 주세요. 변경 기록은 [CHANGELOG.md](CHANGELOG.md).
 
 ## 라이선스
 MIT. [@modelcontextprotocol/sdk](https://github.com/modelcontextprotocol/typescript-sdk)(MIT)를 사용합니다.
