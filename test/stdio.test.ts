@@ -37,7 +37,7 @@ async function runSession(logPath: string, callTrigger: boolean): Promise<{ stde
   return { stderr, refreshed: didRefresh };
 }
 
-test('AC-4: serve over stdio keeps the protocol clean, records a JSONL log and report says PASS (delay >= 200 ms)', async () => {
+test('AC-4: serve over stdio keeps the protocol clean, records a JSONL log and report says PASS (delay >= 250 ms)', { timeout: 60_000 }, async () => {
   const dir = mkdtempSync(join(tmpdir(), 'lcp-'));
   try {
     const log = join(dir, 'nested', 'probe.jsonl'); // the missing folder is created
@@ -52,14 +52,16 @@ test('AC-4: serve over stdio keeps the protocol clean, records a JSONL log and r
     const [v] = judge(events, { thresholdMs: 2000 });
     assert.ok(v);
     assert.equal(v.verdict, 'PASS');
-    assert.ok((v.relist_delay_ms ?? 0) >= 200, `delay was ${v.relist_delay_ms}`);
+    // The SDK client starts its 300 ms debounce only after receiving the (second) notification, so the
+    // delay can never be below ~300 ms; 250 leaves margin and still proves the debounce is in effect.
+    assert.ok((v.relist_delay_ms ?? 0) >= 250, `delay was ${v.relist_delay_ms}`);
     assert.equal(events.at(-1)?.event, 'close');
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
 });
 
-test('AC-4: a second run appends to the same log with increasing seq and a new session', async () => {
+test('AC-4: a second run appends to the same log with increasing seq and a new session', { timeout: 60_000 }, async () => {
   const dir = mkdtempSync(join(tmpdir(), 'lcp-'));
   try {
     const log = join(dir, 'probe.jsonl');

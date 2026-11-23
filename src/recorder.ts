@@ -1,4 +1,4 @@
-import { appendFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { appendFileSync, closeSync, existsSync, mkdirSync, openSync, readFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { randomBytes } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
@@ -47,6 +47,8 @@ export function createRecorder(path: string | null): Recorder {
   const events: LogEvent[] = [];
   if (path !== null) {
     mkdirSync(dirname(path), { recursive: true });
+    // 지금 열어 봐서 쓸 수 없는 경로(읽기 전용 폴더·파일, 폴더 경로)를 시작 시점에 알린다 — 첫 기록 때 터지면 스택이 샌다.
+    closeSync(openSync(path, 'a'));
     seq = nextSeqFor(path);
   }
   return {

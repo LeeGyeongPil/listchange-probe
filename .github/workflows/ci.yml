@@ -6,15 +6,19 @@ on:
   schedule:
     - cron: "17 3 * * 1"   # weekly: catches breakage from dependency or runtime updates
   workflow_dispatch:
+permissions:
+  contents: read
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15   # a hung child process fails fast instead of running for hours
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
+      - run: node --version && npm --version
       - run: npm ci
       - run: npm test
       - run: npm pack --dry-run
