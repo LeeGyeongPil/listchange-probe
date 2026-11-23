@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-11-23
+
+### Fixed
+- `--help`: the `report` exit-code line now matches behavior (0 includes PASS_SLOW, 64 is a usage error). Tests: 42.
+
 ## [0.1.3] - 2026-11-23
 
 ### Fixed
@@ -36,7 +41,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `--lang en|ko`, `LISTCHANGE_PROBE_LANG`, then `LC_ALL`/`LC_MESSAGES`/`LANG`.
 - `examples/dispatcher-server.ts`: fixed-dispatcher workaround for clients that ignore `list_changed`.
 
-[Unreleased]: https://github.com/LeeGyeongPil/listchange-probe/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/LeeGyeongPil/listchange-probe/compare/v0.1.4...HEAD
+[0.1.4]: https://github.com/LeeGyeongPil/listchange-probe/compare/v0.1.3...v0.1.4
+[0.1.3]: https://github.com/LeeGyeongPil/listchange-probe/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/LeeGyeongPil/listchange-probe/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/LeeGyeongPil/listchange-probe/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/LeeGyeongPil/listchange-probe/releases/tag/v0.1.0
