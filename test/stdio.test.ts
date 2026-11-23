@@ -9,6 +9,17 @@ import { judge } from '../src/judge.js';
 import { readLog } from '../src/report.js';
 import { CLI } from './helpers.js';
 
+// Time bounds here only catch a hang; none of them is a speed check, so a slow CI runner cannot fail the test.
+/** Longest wait for the client's re-list after probe_add (the wait ends as soon as it happens). */
+const REFRESH_WAIT_CAP_MS = 30_000;
+/** Per-test bound (two child processes, each closed within 2 s by the SDK). */
+const TEST_TIMEOUT_MS = 120_000;
+/**
+ * Threshold for judging these logs. The test checks that the re-list happened and was debounced,
+ * not how fast this machine is, so it is far above the ~300 ms an SDK client needs.
+ */
+const JUDGE_THRESHOLD_MS = 10_000;
+
 /** Connects an SDK client (default 300 ms debounce) to a real `serve` child process. */
 async function runSession(logPath: string, callTrigger: boolean): Promise<{ stderr: string; refreshed: boolean }> {
   let refreshed: (() => void) | undefined;
@@ -31,13 +42,19 @@ async function runSession(logPath: string, callTrigger: boolean): Promise<{ stde
   let didRefresh = false;
   if (callTrigger) {
     await client.callTool({ name: 'probe_add', arguments: {} });
-    await Promise.race([gotRefresh.then(() => (didRefresh = true)), new Promise((r) => setTimeout(r, 5000))]);
+    // Wait for the refresh, but at most REFRESH_WAIT_CAP_MS; the cap timer is cleared so it never keeps the test process alive.
+    let cap: NodeJS.Timeout | undefined;
+    try {
+      await Promise.race([gotRefresh.then(() => (didRefresh = true)), new Promise((r) => (cap = setTimeout(r, REFRESH_WAIT_CAP_MS)))]);
+    } finally {
+      clearTimeout(cap);
+    }
   }
   await client.close();
   return { stderr, refreshed: didRefresh };
 }
 
-test('AC-4: serve over stdio keeps the protocol clean, records a JSONL log and report says PASS (delay >= 250 ms)', { timeout: 60_000 }, async () => {
+test('AC-4: serve over stdio keeps the protocol clean, records a JSONL log and report says PASS (delay >= 250 ms)', { timeout: TEST_TIMEOUT_MS }, async () => {
   const dir = mkdtempSync(join(tmpdir(), 'lcp-'));
   try {
     const log = join(dir, 'nested', 'probe.jsonl'); // the missing folder is created
@@ -49,7 +66,7 @@ test('AC-4: serve over stdio keeps the protocol clean, records a JSONL log and r
     assert.equal(events[0]?.event, 'start');
     assert.equal(events[0]?.transport, 'stdio');
     assert.ok(events.some((e) => e.method === 'notifications/tools/list_changed' && e.dir === 'out'));
-    const [v] = judge(events, { thresholdMs: 2000 });
+    const [v] = judge(events, { thresholdMs: JUDGE_THRESHOLD_MS });
     assert.ok(v);
     assert.equal(v.verdict, 'PASS');
     // The SDK client starts its 300 ms debounce only after receiving the (second) notification, so the
@@ -61,7 +78,7 @@ test('AC-4: serve over stdio keeps the protocol clean, records a JSONL log and r
   }
 });
 
-test('AC-4: a second run appends to the same log with increasing seq and a new session', { timeout: 60_000 }, async () => {
+test('AC-4: a second run appends to the same log with increasing seq and a new session', { timeout: TEST_TIMEOUT_MS }, async () => {
   const dir = mkdtempSync(join(tmpdir(), 'lcp-'));
   try {
     const log = join(dir, 'probe.jsonl');
@@ -70,7 +87,7 @@ test('AC-4: a second run appends to the same log with increasing seq and a new s
     const events = readLog(log);
     events.forEach((e, i) => assert.equal(e.seq, i));
     assert.equal(new Set(events.map((e) => e.session)).size, 2);
-    const verdicts = judge(events, { thresholdMs: 2000 });
+    const verdicts = judge(events, { thresholdMs: JUDGE_THRESHOLD_MS });
     assert.equal(verdicts[0]?.verdict, 'PASS');
     assert.equal(verdicts[0]?.refreshed_on_new_session, true);
     assert.equal(verdicts[1]?.verdict, 'UNKNOWN');

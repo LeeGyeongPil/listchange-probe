@@ -17,7 +17,8 @@ test('AC-2: refresh=PASS, ignore=FAIL (yet probe_new works), delayed(1500ms, thr
   assert.equal(vi.relist_seq, null);
 
   assert.equal(vd.verdict, 'PASS_SLOW');
-  assert.ok((vd.relist_delay_ms ?? 0) >= 1400 && (vd.relist_delay_ms ?? 0) < 8000, `delay was ${vd.relist_delay_ms}`);
+  // The lower bound proves the client waited; the upper bound only catches a runaway (timers fire late on a busy runner).
+  assert.ok((vd.relist_delay_ms ?? 0) >= 1400 && (vd.relist_delay_ms ?? 0) < 30_000, `delay was ${vd.relist_delay_ms}`);
 });
 
 test('AC-2: the recorder writes monotonic seq, one session, start and close events', async () => {

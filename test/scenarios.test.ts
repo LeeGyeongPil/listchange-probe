@@ -10,8 +10,6 @@ import { createProbeServer } from '../src/server.js';
 import { SCENARIOS } from '../src/scenarios.js';
 import type { Scenario } from '../src/types.js';
 
-const sleep = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
-
 test('AC-3: a removed probe_old gets protocol error -32602 and the verdict carries stale_call with evidence seq', async () => {
   const events = await runMockClient('ignore', { settleMs: 100 });
   const [v] = judge(events, { thresholdMs: 1000 });
@@ -71,10 +69,21 @@ test('server: --after style timer triggers the change without any tool call', as
   const probe = createProbeServer({ scenarios: ['tools'], recorder, afterMs: 50 });
   const [ct, st] = InMemoryTransport.createLinkedPair();
   await probe.connect(st);
-  const client = new Client({ name: 'c', version: '0' }, { listChanged: { tools: { debounceMs: 0, onChanged: () => undefined } } });
+  // 고정 대기 대신 재목록이 실제로 끝났다는 신호를 기다린다(느린 러너에서 타이머가 늦어도 결과가 같다).
+  let markRelisted: () => void = () => undefined;
+  const relisted = new Promise<void>((resolve) => {
+    markRelisted = resolve;
+  });
+  const client = new Client({ name: 'c', version: '0' }, { listChanged: { tools: { debounceMs: 0, onChanged: () => markRelisted() } } });
   await client.connect(ct);
   await client.listTools();
-  await sleep(300);
+  let cap: NodeJS.Timeout | undefined;
+  try {
+    // At most 30 s: only a broken server or client would get that far; the cap timer is always cleared.
+    await Promise.race([relisted, new Promise<void>((r) => (cap = setTimeout(r, 30_000)))]);
+  } finally {
+    clearTimeout(cap);
+  }
   await client.close();
   const [v] = judge(recorder.events, { thresholdMs: 1000 });
   assert.equal(v?.verdict, 'PASS');

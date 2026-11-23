@@ -72,7 +72,8 @@ test('AC-6: demo prints the simulated banner and PASS / FAIL / PASS_SLOW within 
   const started = Date.now();
   const result = runCli(['demo']);
   assert.equal(result.status, 0, result.stderr);
-  assert.ok(Date.now() - started < 10_000);
+  const elapsed = Date.now() - started;
+  assert.ok(elapsed < 10_000, `demo took ${elapsed} ms (AC-6 limit 10 s)`);
   assert.match(result.stdout, /simulated/);
   assert.match(result.stdout, /mock:refresh\s+s-\w+\s+tools\s+PASS\s/);
   assert.match(result.stdout, /mock:ignore\s+s-\w+\s+tools\s+FAIL\s/);
