@@ -1,6 +1,6 @@
 {
   "name": "listchange-probe",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Probe MCP clients: does a client re-fetch tools/prompts/resources after a list_changed notification? Records the traffic and judges PASS / PASS_SLOW / FAIL / UNKNOWN.",
   "license": "MIT",
   "type": "module",

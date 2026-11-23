@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-23
+
+### Fixed
+- Stabilized the stdio, in-memory and CLI tests so the CI workflow passes.
+
 ## [0.1.0] - 2026-11-23
 
 ### Added
@@ -16,5 +21,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `--lang en|ko`, `LISTCHANGE_PROBE_LANG`, then `LC_ALL`/`LC_MESSAGES`/`LANG`.
 - `examples/dispatcher-server.ts`: fixed-dispatcher workaround for clients that ignore `list_changed`.
 
-[Unreleased]: https://github.com/LeeGyeongPil/listchange-probe/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/LeeGyeongPil/listchange-probe/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/LeeGyeongPil/listchange-probe/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/LeeGyeongPil/listchange-probe/releases/tag/v0.1.0
