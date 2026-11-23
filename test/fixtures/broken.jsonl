@@ -1,0 +1,2 @@
+{"v": 1, "seq": 0, "ts": "2026-11-23T05:00:00.000Z", "t_ms": 1, "session": "s-b", "event": "start", "tool": "listchange-probe", "version": "0.1.0", "transport": "stdio", "scenarios": ["tools"]}
+{not json

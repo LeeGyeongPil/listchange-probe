@@ -1,0 +1,12 @@
+{"v": 1, "seq": 0, "ts": "2026-11-23T05:00:00.000Z", "t_ms": 1, "session": "s-early", "event": "start", "tool": "listchange-probe", "version": "0.1.0", "transport": "stdio", "scenarios": ["tools"]}
+{"v": 1, "seq": 1, "ts": "2026-11-23T05:00:00.000Z", "t_ms": 2, "session": "s-early", "dir": "in", "kind": "request", "method": "initialize", "id": 0, "client": {"name": "fixture-client"}}
+{"v": 1, "seq": 2, "ts": "2026-11-23T05:00:00.000Z", "t_ms": 3, "session": "s-early", "dir": "out", "kind": "response", "id": 0, "protocol_version": "2025-11-25"}
+{"v": 1, "seq": 3, "ts": "2026-11-23T05:00:00.000Z", "t_ms": 4, "session": "s-early", "dir": "in", "kind": "notification", "method": "notifications/initialized"}
+{"v": 1, "seq": 4, "ts": "2026-11-23T05:00:00.000Z", "t_ms": 5, "session": "s-early", "dir": "in", "kind": "request", "method": "tools/list", "id": 1}
+{"v": 1, "seq": 5, "ts": "2026-11-23T05:00:00.000Z", "t_ms": 5, "session": "s-early", "dir": "out", "kind": "response", "id": 1}
+{"v": 1, "seq": 6, "ts": "2026-11-23T05:00:00.000Z", "t_ms": 6, "session": "s-early", "dir": "in", "kind": "request", "method": "tools/call", "id": 2, "name": "probe_add"}
+{"v": 1, "seq": 7, "ts": "2026-11-23T05:00:00.000Z", "t_ms": 6, "session": "s-early", "dir": "out", "kind": "response", "id": 2}
+{"v": 1, "seq": 8, "ts": "2026-11-23T05:00:00.000Z", "t_ms": 7, "session": "s-early", "event": "mutation", "scenario": "tools", "added": ["probe_new"], "removed": ["probe_old"]}
+{"v": 1, "seq": 9, "ts": "2026-11-23T05:00:00.000Z", "t_ms": 7, "session": "s-early", "dir": "out", "kind": "notification", "method": "notifications/tools/list_changed"}
+{"v": 1, "seq": 10, "ts": "2026-11-23T05:00:00.000Z", "t_ms": 7, "session": "s-early", "dir": "out", "kind": "notification", "method": "notifications/tools/list_changed"}
+{"v": 1, "seq": 11, "ts": "2026-11-23T05:00:00.000Z", "t_ms": 507, "session": "s-early", "event": "close"}
