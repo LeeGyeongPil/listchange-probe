@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { judge } from '../src/judge.js';
-import { readLog } from '../src/report.js';
-import { fixture } from './helpers.js';
+import { judge } from '../../src/judge.js';
+import { readLog } from '../../src/report.js';
+import { fixture } from '../helpers.js';
 
 const judgeFixture = (name: string, thresholdMs = 2000) => judge(readLog(fixture(name)), { thresholdMs });
 

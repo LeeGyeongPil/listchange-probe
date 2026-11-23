@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
-import { createDispatcherServer } from '../examples/dispatcher-server.js';
+import { createDispatcherServer } from '../../examples/dispatcher-server.js';
 
 function textOf(result: unknown): string {
   const content = (result as { content: { type: string; text: string }[] }).content;

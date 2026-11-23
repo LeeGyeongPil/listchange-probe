@@ -5,9 +5,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
-import { judge } from '../src/judge.js';
-import { readLog } from '../src/report.js';
-import { CLI } from './helpers.js';
+import { judge } from '../../src/judge.js';
+import { readLog } from '../../src/report.js';
+import { CLI } from './spawn.js';
 
 // Time bounds here only catch a hang; none of them is a speed check, so a slow CI runner cannot fail the test.
 /** Longest wait for the client's re-list after probe_add (the wait ends as soon as it happens). */
@@ -54,7 +54,7 @@ async function runSession(logPath: string, callTrigger: boolean): Promise<{ stde
   return { stderr, refreshed: didRefresh };
 }
 
-test('AC-4: serve over stdio keeps the protocol clean, records a JSONL log and report says PASS (delay >= 250 ms)', { timeout: TEST_TIMEOUT_MS }, async () => {
+test('AC-10: serve over stdio keeps the protocol clean, records a JSONL log and report says PASS (delay >= 250 ms)', { timeout: TEST_TIMEOUT_MS }, async () => {
   const dir = mkdtempSync(join(tmpdir(), 'lcp-'));
   try {
     const log = join(dir, 'nested', 'probe.jsonl'); // the missing folder is created
@@ -78,7 +78,7 @@ test('AC-4: serve over stdio keeps the protocol clean, records a JSONL log and r
   }
 });
 
-test('AC-4: a second run appends to the same log with increasing seq and a new session', { timeout: TEST_TIMEOUT_MS }, async () => {
+test('AC-10: a second run appends to the same log with increasing seq and a new session', { timeout: TEST_TIMEOUT_MS }, async () => {
   const dir = mkdtempSync(join(tmpdir(), 'lcp-'));
   try {
     const log = join(dir, 'probe.jsonl');
