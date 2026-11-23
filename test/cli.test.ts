@@ -86,6 +86,18 @@ test('AC-5: mixed PASS + UNKNOWN exits 2 (no FAIL but at least one UNKNOWN)', ()
   assert.match(runCli(['--help']).stdout, /2 no FAIL but at least one UNKNOWN/);
 });
 
+test('AC-5: --help lists the same exit codes the CLI really returns (PASS_SLOW is 0, usage error is 64)', () => {
+  // 도움말만 읽는 스크립트 작성자가 PASS_SLOW 를 실패로 오해하지 않도록, 도움말 문구를 실제 종료 코드와 맞춰 둔다.
+  assert.equal(runCli(['report', fixture('slow.jsonl')]).status, 0);
+  assert.equal(runCli(['report']).status, 64);
+  const en = runCli(['--help', '--lang', 'en']).stdout;
+  assert.match(en, /0 all PASS or PASS_SLOW/);
+  assert.match(en, /64 usage error/);
+  const ko = runCli(['--help', '--lang', 'ko']).stdout;
+  assert.match(ko, /0 모두 PASS 또는 PASS_SLOW/);
+  assert.match(ko, /64 사용법 오류/);
+});
+
 test('negative numbers and unwritable log paths give localized messages', () => {
   const neg = runCli(['report', fixture('pass.jsonl'), '--threshold-ms', '-5', '--lang', 'ko']);
   assert.equal(neg.status, 64);

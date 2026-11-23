@@ -9,7 +9,8 @@ export const ko: Record<keyof typeof en, string> = {
       stdio 로 프로브 MCP 서버를 띄우고 모든 통신을 <파일>(JSONL)에 기록합니다.
       확인할 클라이언트에 붙인 뒤 에이전트에게 probe_add 를 호출해 달라고 하세요.
   listchange-probe report <파일...> [--format table|json] [--threshold-ms <ms>] [--lang en|ko]
-      기록을 판정합니다. 종료 코드: 0 모두 PASS, 1 FAIL 있음, 2 FAIL 은 없고 UNKNOWN 이 하나 이상, 3 입력 오류.
+      기록을 판정합니다. 종료 코드: 0 모두 PASS 또는 PASS_SLOW, 1 FAIL 있음,
+      2 FAIL 은 없고 UNKNOWN 이 하나 이상, 3 입력 오류, 64 사용법 오류.
   listchange-probe demo [--lang en|ko]
       모의 클라이언트 3개(갱신·무시·늦은 갱신)로 오프라인 연습 실행.
 

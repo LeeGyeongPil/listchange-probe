@@ -7,7 +7,8 @@ Usage:
       Run the probe MCP server on stdio and record all traffic to <file> (JSONL).
       Attach it to the client you want to check, then ask the agent to call probe_add.
   listchange-probe report <file...> [--format table|json] [--threshold-ms <ms>] [--lang en|ko]
-      Judge the recorded traffic. Exit code: 0 all PASS, 1 any FAIL, 2 no FAIL but at least one UNKNOWN, 3 bad input.
+      Judge the recorded traffic. Exit code: 0 all PASS or PASS_SLOW, 1 any FAIL,
+      2 no FAIL but at least one UNKNOWN, 3 bad input, 64 usage error.
   listchange-probe demo [--lang en|ko]
       Offline practice run with three simulated clients (refresh, ignore, delayed).
 
