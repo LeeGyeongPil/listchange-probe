@@ -1,4 +1,7 @@
 # No keys, models or network needed: the whole flow runs against simulated clients and a stdio child process.
+# Every stage is its own named step and keeps its output in ci-logs/. If the job fails, the last step
+# explains why without anyone downloading the raw log: failing tests (or the error lines of the step that
+# broke) become annotations on the run, the run summary gets the log tail, and ci-logs/ is uploaded.
 name: ci
 on:
   push:
@@ -12,13 +15,48 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 15   # a hung child process fails fast instead of running for hours
+    defaults:
+      run:
+        shell: bash   # runs as bash -eo pipefail, so "command | tee log" still fails when the command fails
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - name: Check out
+        uses: actions/checkout@v6
+      - name: Set up Node 22
+        uses: actions/setup-node@v6
         with:
           node-version: 22
-          cache: npm
-      - run: node --version && npm --version
-      - run: npm ci
-      - run: npm test
-      - run: npm pack --dry-run
+      - name: Show environment
+        run: |
+          mkdir -p ci-logs
+          {
+            echo "node $(node --version), npm $(npm --version)"
+            uname -a
+            id
+            echo "cpus $(nproc), LANG=${LANG:-unset}, TZ=${TZ:-unset}, CI=${CI:-unset}"
+          } 2>&1 | tee ci-logs/0-environment.log
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund 2>&1 | tee ci-logs/1-install-dependencies.log
+      - name: Build
+        run: npm run build 2>&1 | tee ci-logs/2-build.log
+      - name: Smoke test the CLI
+        run: |
+          {
+            node dist/src/cli.js --version
+            node dist/src/cli.js demo --lang en
+          } 2>&1 | tee ci-logs/3-smoke-test.log
+      - name: Test
+        timeout-minutes: 10
+        run: npm test 2>&1 | tee ci-logs/4-test.log
+      - name: Check package contents
+        run: npm pack --dry-run 2>&1 | tee ci-logs/5-package-contents.log
+      - name: Explain the failure
+        if: failure() || cancelled()
+        run: node .github/scripts/explain-failure.mjs ci-logs
+      - name: Upload step logs
+        if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ci-logs
+          path: ci-logs/
+          if-no-files-found: ignore
+          retention-days: 14
