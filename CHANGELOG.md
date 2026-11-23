@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-11-23
+
+### Fixed
+- Tests: timing assertions relaxed further for slow CI runners; the CLI test child process now has a 120 s upper bound.
+- CI: the workflow prints diagnostics on failure, using the new helper `.github/scripts/explain-failure.mjs`.
+
 ## [0.1.2] - 2026-11-23
 
 ### Fixed
