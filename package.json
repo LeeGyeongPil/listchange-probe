@@ -1,0 +1,46 @@
+{
+  "name": "listchange-probe",
+  "version": "0.1.0",
+  "description": "Probe MCP clients: does a client re-fetch tools/prompts/resources after a list_changed notification? Records the traffic and judges PASS / PASS_SLOW / FAIL / UNKNOWN.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "listchange-probe": "dist/src/cli.js"
+  },
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "files": [
+    "dist/src",
+    "dist/examples",
+    "README.md",
+    "README.ko.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "list_changed",
+    "conformance",
+    "cli"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "pretest": "npm run build",
+    "test": "node --test dist/test/*.test.js",
+    "prestart": "npm run build",
+    "start": "node dist/src/cli.js demo",
+    "prepack": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "22.13.14",
+    "typescript": "5.9.3"
+  }
+}
